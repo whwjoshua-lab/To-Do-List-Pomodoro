@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TranquilityCraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <canvas id="bgCanvas"></canvas>
+
+    <audio id="bgm" src="Loopable (BGM.24 seconds).mp3" preload="auto" loop></audio>
+    <audio id="alarmSound" src="Alarm Sound (15 seconds) .mp3" preload="auto"></audio>
+
+    <!-- Intro Page -->
+    <div id="intro-page" class="intro-container">
+        <h1 class="intro-title">TranquilityCraft</h1>
+        <p class="intro-subtitle">Select a mode to begin</p>
+        <div class="intro-buttons">
+            <button class="pixel-btn intro-btn" data-target="todo">To-Do List</button>
+            <button class="pixel-btn intro-btn" data-target="pomodoro">Pomodoro Timer</button>
+            <button class="pixel-btn intro-btn" data-target="settings">Settings</button>
+        </div>
+    </div>
+
+    <div class="app-container hidden">
+        <header>
+            <h1>TranquilityCraft</h1>
+            <nav class="main-nav">
+                <button id="tab-todo" class="nav-btn active">To-Do</button>
+                <button id="tab-pomodoro" class="nav-btn">Pomodoro</button>
+                <button id="tab-settings" class="nav-btn">Settings</button>
+            </nav>
+            <div class="controls">
+                <!-- Theme selector moved to Settings tab -->
+            </div>
+        </header>
+
+        <!-- To-Do App View -->
+        <div id="todo-app" class="app-view">
+            <div class="view-header">
+                <h2>Task Board</h2>
+                <button id="addTaskBtn" class="pixel-btn">Add Task</button>
+            </div>
+            <main class="board">
+                <div class="column" id="todo-col" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="column-header">TO DO</div>
+                    <div class="task-list" id="todo-list">
+                        <!-- Tasks will go here -->
+                    </div>
+                </div>
+
+                <div class="column" id="inprogress-col" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="column-header">IN PROGRESS</div>
+                    <div class="task-list" id="inprogress-list">
+                        <!-- Tasks will go here -->
+                    </div>
+                </div>
+
+                <div class="column" id="done-col" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="column-header">DONE</div>
+                    <div class="task-list" id="done-list">
+                        <!-- Tasks will go here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Pomodoro App View -->
+        <div id="pomodoro-app" class="app-view hidden">
+            <div class="view-header">
+                <h2>Focus Timer</h2>
+                <button id="musicToggle" class="pixel-btn">[MUSIC: ON]</button>
+            </div>
+
+            <main class="timer-container">
+                <div class="timer-display">
+                    <span id="minutes">25</span><span class="separator">:</span><span id="seconds">00</span>
+                </div>
+
+                <div class="timer-controls">
+                    <button id="startPauseBtn" class="pixel-btn large">Start</button>
+                    <button id="resetBtn" class="pixel-btn large">Reset</button>
+                </div>
+
+                <div class="presets">
+                    <button class="pixel-btn preset-btn" data-time="30">30m</button>
+                    <button class="pixel-btn preset-btn" data-time="45">45m</button>
+                    <button class="pixel-btn preset-btn" data-time="60">60m</button>
+                    <button id="customTimerBtn" class="pixel-btn preset-btn">Custom</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- Settings App View -->
+        <div id="settings-app" class="app-view hidden">
+            <div class="view-header">
+                <h2>Settings</h2>
+            </div>
+
+            <main class="settings-container">
+                <div class="settings-section">
+                    <h3>Select Theme</h3>
+                    <div class="theme-grid">
+                        <div class="theme-card active" data-theme="snow">
+                            <div class="theme-preview snow-preview"></div>
+                            <span>Snow</span>
+                        </div>
+                        <div class="theme-card" data-theme="leaves">
+                            <div class="theme-preview leaves-preview"></div>
+                            <span>Leaves</span>
+                        </div>
+                        <div class="theme-card" data-theme="rain">
+                            <div class="theme-preview rain-preview"></div>
+                            <span>Rain</span>
+                        </div>
+                        <div class="theme-card" data-theme="fireflies">
+                            <div class="theme-preview fireflies-preview"></div>
+                            <span>Fireflies</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for new task -->
+    <div id="taskModal" class="modal hidden">
+        <div class="modal-content pixel-box">
+            <span class="close">&times;</span>
+            <h2>New Task</h2>
+            <input type="text" id="taskInput" placeholder="Enter task..." maxlength="30">
+            <button id="saveTaskBtn" class="pixel-btn">Save</button>
+        </div>
+    </div>
+
+    <!-- Custom Timer Modal -->
+    <div id="customTimerModal" class="modal hidden">
+        <div class="modal-content pixel-box">
+            <h2>Set Timer</h2>
+            <div class="modal-display">
+                <span id="modalHr">00</span>:<span id="modalMin">00</span>:<span id="modalSec">00</span>
+            </div>
+
+            <div class="unit-selector">
+                <button class="pixel-btn unit-btn" data-unit="hr">HR</button>
+                <button class="pixel-btn unit-btn active" data-unit="min">MIN</button>
+                <button class="pixel-btn unit-btn" data-unit="sec">SEC</button>
+            </div>
+
+            <div class="numpad">
+                <button class="pixel-btn num-btn" data-num="1">1</button>
+                <button class="pixel-btn num-btn" data-num="2">2</button>
+                <button class="pixel-btn num-btn" data-num="3">3</button>
+                <button class="pixel-btn num-btn" data-num="4">4</button>
+                <button class="pixel-btn num-btn" data-num="5">5</button>
+                <button class="pixel-btn num-btn" data-num="6">6</button>
+                <button class="pixel-btn num-btn" data-num="7">7</button>
+                <button class="pixel-btn num-btn" data-num="8">8</button>
+                <button class="pixel-btn num-btn" data-num="9">9</button>
+                <button class="pixel-btn num-btn" data-num="0">0</button>
+            </div>
+
+            <div class="modal-actions">
+                <button id="modalCancelBtn" class="pixel-btn">Cancel</button>
+                <button id="modalSetBtn" class="pixel-btn">Set</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Up Modal -->
+    <div id="timeUpModal" class="modal hidden">
+        <div class="modal-content pixel-box" style="text-align: center;">
+            <div class="modal-display" style="font-size: 20px; margin-bottom: 20px;">
+                Time Is Up!
+            </div>
+            <div class="modal-actions" style="justify-content: center;">
+                <button id="timeUpOkBtn" class="pixel-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
